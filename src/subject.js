@@ -16,6 +16,8 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import {addSubject, deleteSubject, getSubjectList, loginUser, allUsers} from "./_data";
+import record from "./redux/reducer/sample";
 
 
 class Subject extends React.Component{
@@ -25,55 +27,24 @@ class Subject extends React.Component{
             subject:"",
             subjectList:[],
             open:false,
-            alert:false
+            alert:false,
+            records:[],
         }
     }
 
-    componentDidMount() {
+    async componentDidMount(e) {
         /*const path = this.props.history.location.pathname;
         const splittedRute = path.split("/")[2] || null;*/
-
-        const token = localStorage.getItem('token');
-
-        axios({
-            method: 'get',
-            url: 'http://localhost:8080/api/getLoggedInUser',
-            headers: {"Authorization": `Bearer ${token}`},
-        }).then(res => {
-
-            if (res.data.role === "admin") {
-                axios({
-                    method: 'get',
-                    url: 'http://localhost:8080/api/users',
-                }).then(res => {
-                    console.log(res.data);
-                    this.setState({
-                        records: res.data,
-                    });
-                }).catch(err => {
-                    console.log("Submit form:- ", err);
-                });
-
-                axios({
-                    method: 'get',
-                    url: 'http://localhost:8080/api/subjectList',
-                }).then(res => {
-                    console.log(res.data);
-                    this.setState({
-                        subjectList: res.data,
-                    });
-                }).catch(err => {
-                    console.log("Submit form:- ", err);
-                });
-            } else {
-                this.props.history.push({
-                    pathname: `/blog`,
-                })
-
-            }
+        const response = await loginUser();
+        console.log(response.data);
+        const subjectList = await getSubjectList();
+        const allUser = await allUsers();
+        console.log(subjectList.data);
+        this.setState({
+            subjectList:subjectList.data,
+            records:allUser.data
         })
     }
-
 
     handleChange = (e) => {
         this.setState({
@@ -95,30 +66,23 @@ class Subject extends React.Component{
         })
     };
 
-    handleSub = () => {
+    handleSub = async () => {
         debugger
         const {subject , subjectList} = this.state;
         console.log(subject);
         const list = subjectList.some(ele => ele.subject === subject.charAt().toUpperCase()+ subject.slice(1).toLowerCase());
+
         if(list === false){
-            axios({
-                method: 'post',
-                url: 'http://localhost:8080/api/subject',
-                data: {
-                    "subject": subject.charAt().toUpperCase()+ subject.slice(1).toLowerCase()
-                }
-            }).then(res => {
-                subjectList.push(res.data);
-                this.setState({
-                    subjectList,
-                    open:false,
-                    subject:""
-                });
-
-            }).catch(err => {
-                console.log("Submit form:- ",err);
+            const data = {
+                "subject": subject.charAt().toUpperCase()+ subject.slice(1).toLowerCase()
+            };
+            const responce = await addSubject(data);
+            subjectList.push(responce.data);
+            this.setState({
+                subjectList,
+                open:false,
+                subject:""
             });
-
         }else {
             this.setState({
                 alert: true,
@@ -127,9 +91,26 @@ class Subject extends React.Component{
         }
     };
 
-    onDelete = (ele) => {
+    onDelete = async (ele) => {
         debugger
-        axios({
+        console.log(this.state.records);
+        const userSub = this.state.records.find(e => e.course === ele._id);
+        console.log(userSub);
+        if(userSub === undefined){
+            const res = await deleteSubject(ele.subject);
+            console.log(res.data);
+            const { subjectList } = this.state;
+            const delrecords = subjectList.filter(e => e.subject !== res.data.subject);
+            this.setState({
+                subjectList: delrecords
+            });
+        }else {
+            this.setState({
+                alert: true,
+            });
+        }
+
+       /* axios({
             method: 'delete',
             url: 'http://localhost:8080/api/subdelete/'+ele,
         }).then(res => {
@@ -141,7 +122,7 @@ class Subject extends React.Component{
             });
         }).catch(err => {
             console.log("Submit form:- ", err.response.data.message);
-        });
+        });*/
 
     };
 
@@ -196,7 +177,7 @@ class Subject extends React.Component{
                                         <TableCell align="center">{ele.subject}</TableCell>
 
                                         <TableCell align="center">
-                                            <Button variant="contained"  id={ele.subject} color="secondary" onClick={()=>this.onDelete(ele.subject)}>Delete</Button>
+                                            <Button variant="contained"  id={ele.subject} color="secondary" onClick={()=>this.onDelete(ele)}>Delete</Button>
                                         </TableCell>
                                     </TableRow>
                                 ))

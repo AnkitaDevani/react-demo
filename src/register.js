@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import './App.css';
+import './styles.scss';
 import { connect } from "react-redux";
 import { addTodo,delTodo,updateTodo } from "./redux/actions";
 //import record from "./redux/reducer/sample";
@@ -15,9 +15,8 @@ import IconButton from "@material-ui/core/IconButton";
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 
+import {getSubjectList, userRegistration, updatedUser, loginUser, allUsers} from "./_data";
 
-
-//axios.baseURL = "http://localhost:8080/api/";
 
 class Register extends React.Component{
   constructor(props){
@@ -33,7 +32,7 @@ class Register extends React.Component{
       hobbiesList : [{name: 'Reading', isChecked: false},
         {name: 'Travelling', isChecked: false},
         {name: 'Dancing', isChecked: false}],
-      courseList: [{name: 'Computer'},{name: 'Maths'},{name: 'Science'}],
+      courseList: [],
       editableId:null,
       records:[],
       profile:"",
@@ -43,47 +42,32 @@ class Register extends React.Component{
 
   async componentDidMount(e) {
     const isLoggedIn = localStorage.getItem("token");
-    debugger
-
-    axios({
-      method: 'get',
-      url: 'http://localhost:8080/api/subjectList',
-    }).then(res => {
-      console.log(res.data);
-      this.setState({
-        courseList: res.data,
-      });
-    }).catch(err => {
-      console.log("Submit form:- ",err);
-    });
-
+    const subjectList = await getSubjectList();
     if(isLoggedIn === "null") {
-      this.props.history.push({
-        pathname: `/register`,
-      })
+        this.setState({
+          courseList: subjectList.data,
+        });
+        this.props.history.push({
+          pathname: `/register`,
+        })
     } else {
-      const response = await axios.get("http://localhost:8080/api/getLoggedInUser", { headers: {"Authorization" : `Bearer ${isLoggedIn}`} });
-      if (response.data.role === "admin") {
+        const response = await loginUser();
+      if(response.data.role === "admin") {
+        const allUser = await allUsers();
+        console.log(allUser.data);
         const path = this.props.history.location.pathname;
         const splittedRute = path.split("/")[2] || null;
-        axios({
-          method: 'get',
-          url: 'http://localhost:8080/api/users',
-        }).then(res => {
-          console.log(res.data);
-          const findUser = res.data.find(ele => ele._id === splittedRute);
-          this.onEdit(findUser);
-        }).catch(err => {
-          console.log("Submit form:- ",err);
-        });
-      } else {
-        console.log(response.data);
-        this.onEdit(response.data);
-        this.state.records.push(response.data);
-        console.log(this.state.records);
+        const user = allUser.data.find(ele => ele._id === splittedRute);
         this.setState({
-          records:this.state.records
-        })
+          records: allUser.data,
+          courseList: subjectList.data,
+        }, () => this.onEdit(user));
+      }else {
+        this.state.records.push(response.data);
+        this.setState({
+          records: this.state.records,
+          courseList: subjectList.data,
+        }, () => this.onEdit(response.data))
       }
     }
   }
@@ -96,57 +80,46 @@ class Register extends React.Component{
     });
   };
 
-  submitForm = () => {
-    const { fname, lname, hobbies,course, gender, email, password,editableId} = this.state;
+  submitForm = async () => {
+    const {fname, lname, hobbies, course, gender, email, password, editableId, courseList} = this.state;
     const token = localStorage.getItem("token");
-    if(token === "null"){
-      axios({
-        method: 'post',
-        url: 'http://localhost:8080/api/submit',
-        data: {
-          "fname": fname,
-          "lname":lname,
-          "hobbies":hobbies,
-          "email":email,
-          "password": password,
-          "gender":gender,
-          "course":course,
-          "role":"user"
-        }
-      }).then(res => {
-        this.clearForm();
-        this.props.history.push({
-          pathname: `/login`,
-        });
-      }).catch(err => {
-        console.log("Submit form:- ",err);
-      });
-    } else {
+    const selectedCourse = courseList.find(ele => ele.subject === course);
+    if (token === "null") {
+      const data = {
+        "fname": fname.charAt().toUpperCase()+ fname.slice(1).toLowerCase(),
+        "lname": lname.charAt().toUpperCase()+ lname.slice(1).toLowerCase(),
+        "hobbies": hobbies,
+        "email": email,
+        "password": password,
+        "gender": gender,
+        "course": selectedCourse._id,
+        "role": "user"
+      };
+      const registration = await userRegistration(data);
+      console.log(registration.data);
       this.clearForm();
-      debugger
-      axios({
-        method: 'patch',
-        url: 'http://localhost:8080/api/update/'+editableId,
-        headers: {"Authorization" : `Bearer ${token}`},
-        data: {
-          "fname": fname,
-          "lname":lname,
-          "hobbies":hobbies,
-          "email":email,
-          "password": password,
-          "gender":gender,
-          "course":course,
-        }
-      }).then(res => {
-        this.clearForm();
-        this.props.history.push({
-          pathname: `/blog`,
-        });
-      }).catch(err => {
-        console.log("Submit form:- ",err);
+      this.props.history.push({
+        pathname: `/login`,
+      });
+
+    } else {
+      const data = {
+        "fname": fname.charAt().toUpperCase()+ fname.slice(1).toLowerCase(),
+        "lname": lname.charAt().toUpperCase()+ lname.slice(1).toLowerCase(),
+        "hobbies": hobbies,
+        "email": email,
+        "password": password,
+        "gender": gender,
+        "course": selectedCourse._id,
+      };
+      this.clearForm();
+      const registration = await updatedUser(editableId, data);
+      console.log(registration.data);
+      this.clearForm();
+      this.props.history.push({
+        pathname: `/blog`,
       });
     }
-
   };
 
   clearForm = () => {
@@ -192,12 +165,14 @@ class Register extends React.Component{
   };
 
   onEdit = (editUser) => {
+    const {courseList} = this.state;
+    const course = courseList.find(ele => ele._id === editUser.course);
     this.setState({
       fname: editUser.fname,
       lname: editUser.lname,
       age: editUser.age,
       hobbies:editUser.hobbies,
-      course: editUser.course,
+      course: course.subject,
       email: editUser.email ,
       password: editUser.password,
       gender:editUser.gender,
@@ -235,15 +210,14 @@ class Register extends React.Component{
 
         <div style={{backgroundColor:'skyblue'}} >
           <div className="container">
-            <h1 align='left' style={{margin:'0px 10px',padding:'5px',fontSize:'40px'}}>Register</h1>
-            <div style={{display:'flex',alignItems:'center'}}>
-              <h1 align='left' style={{margin:'0px 15px 5px',fontSize:'15px',fontWeight:'lighter'}}>Create your account</h1>
+            <h1 align='left' >Register</h1>
+            <div>
+              <h1 align='left' >Create your account</h1>
             </div>
-            <FormGroup style={{margin:'10px' }}>
-
+            <FormGroup>
               <TextField style={{margin:'6px'}} id="outlined-basic" name="fname" value={fname} label="FirstName" onChange={this.handleChange} variant="outlined" />
-              <TextField style={{margin:'6px'}} id="outlined-basic" name="lname" value={lname} label="LastName" onChange={this.handleChange} variant="outlined" />
-              <TextField style={{margin:'6px'}} id="outlined-basic" name="email" value={email} label="Email" onChange={this.handleChange} variant="outlined" />
+              <TextField style={{margin:'6px'}} id="outlined-basic1" name="lname" value={lname} label="LastName" onChange={this.handleChange} variant="outlined" />
+              <TextField style={{margin:'6px'}} id="outlined-basic2" name="email" value={email} label="Email" onChange={this.handleChange} variant="outlined" />
               {/*  <TextField style={{margin:'6px'}} id="outlined-basic" name="password" value={password} label="Password" onChange={this.handleChange}
                      disabled={token === "null" ?false:true} variant="outlined"/>*/}
 
@@ -273,8 +247,8 @@ class Register extends React.Component{
               <FormControl variant="outlined" style={{margin:'6px'}}>
                 <InputLabel >Course</InputLabel>
                 <Select label="Course" name="course" value={course} onChange={this.handleChange} >
-                  {courseList.map(c =>
-                      <MenuItem key={c.subject} value={c.subject}>{c.subject}</MenuItem>
+                  {courseList.map((c,i) =>
+                      <MenuItem key={i} value={c.subject}>{c.subject}</MenuItem>
                   )}
                 </Select>
               </FormControl>
@@ -293,18 +267,15 @@ class Register extends React.Component{
                 </FormLabel>
               </FormControl>
 
-
               {/*<FormControl>
               <FormLabel style={{margin:'6px'}}>Profile picture :
                 <input accept="image/*" style={{ display: 'none' }} name="profile" value={profile} id="raised-button-file" onChange={this.handleChange} type="file"/>
                 <Button variant="contained" component="span" style={{marginLeft:'10px'}}> Upload </Button>
-
-              </FormLabel>
-          </FormControl>*/}
+               </FormLabel>
+            </FormControl>*/}
 
               <FormControl style={{width:'430px',margin:'auto',marginTop:'10px'}}>
                 <ThemeProvider theme={this.theme}>
-
                   <Button variant="contained" color="primary" onClick={this.submitForm}>{token !== "null" ? "Submit" : "Create Account"} </Button>
                 </ThemeProvider>
               </FormControl>

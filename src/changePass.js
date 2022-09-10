@@ -21,6 +21,8 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Draggable from 'react-draggable';
 import Paper from '@material-ui/core/Paper';
 import Layout from "./layout";
+import config from "./url";
+import {changePass} from "./_data";
 
 function PaperComponent(props) {
     return (
@@ -57,30 +59,26 @@ class ChangePass extends React.Component{
         });
     };
 
-    submitForm = () => {
+    submitForm = async () => {
         debugger
         const {password, reenterPass, newPass} = this.state;
         const token = localStorage.getItem("token");
         if(newPass === reenterPass) {
-            axios({
-                method: 'patch',
-                url: 'http://localhost:8080/api/changepassword',
-                headers: {"Authorization": `Bearer ${token}`},
-                data: {
-                    "oldPass": password,
+            const data = {
+                "oldPass": password,
                     "password": newPass
-                }
-            }).then(res => {
+            };
+            const res = await changePass(data);
+            if(res.success === true){
                 this.props.history.push({
                     pathname:`/blog`,
                 });
                 this.clearForm();
-            }).catch(err => {
+            }else {
                 this.setState({
                     openAlert:true
                 });
-                console.log("Submit form:- ", err);
-            });
+            }
         }else{
             this.setState({
                 open:true
@@ -130,7 +128,7 @@ class ChangePass extends React.Component{
             <div>
 
                 <div className="container_forgot">
-                    <h1 align='left' style={{margin:'0px 10px',padding:'15px',fontSize:'40px'}}>Change Password</h1>
+                    <h1 align='left'>Change Password</h1>
                     <FormGroup style={{margin:'10px' }}>
                         <FormControl  style={{margin:'10px 15px'}}>
                             <OutlinedInput id="outlined-adornment-password" type={showPassword ? 'text' : 'password'}
@@ -152,7 +150,7 @@ class ChangePass extends React.Component{
                         </FormControl>
 
                         <FormControl  style={{margin:'10px 15px'}}>
-                            <OutlinedInput id="outlined-adornment-password" type={showPassword ? 'text' : 'password'}
+                            <OutlinedInput id="outlined-adornment-password1" type={showPassword ? 'text' : 'password'}
                                            name="newPass" value={newPass} placeholder="New Password" onChange={this.handleChange}
                                            startAdornment={
                                                <InputAdornment position="start">
@@ -171,7 +169,7 @@ class ChangePass extends React.Component{
                         </FormControl>
 
                         <FormControl  style={{margin:'10px 15px'}}>
-                            <OutlinedInput id="outlined-adornment-password" type={showPassword ? 'text' : 'password'}
+                            <OutlinedInput id="outlined-adornment-password2" type={showPassword ? 'text' : 'password'}
                                            name="reenterPass" value={reenterPass} placeholder="Re-enter New Password" onChange={this.handleChange}
                                            startAdornment={
                                                <InputAdornment position="start">

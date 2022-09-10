@@ -20,7 +20,8 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Draggable from 'react-draggable';
 import Paper from '@material-ui/core/Paper';
-import UnAuth from "./loginbar";
+import config from "./url";
+import {addactiveUser} from "./_data";
 
 function PaperComponent(props) {
     return (
@@ -65,12 +66,32 @@ class LogIn extends React.Component{
         });
     };
 
-    submitForm = () => {
+    submitForm = async () => {
+        debugger
         const {email, password, records} = this.state;
+        const data = {
+            "email": email,
+            "password": password
+        };
+        const res = await addactiveUser(data);
+        if (res.success === true) {
+            localStorage.setItem("token", res.data.token);
+            localStorage.setItem("email", res.data.email);
+            this.props.history.push({
+                pathname: `/blog`,
+            });
+            this.clearForm();
+        } else {
+            this.setState({
+                open: true
+            });
+            this.clearForm();
+        }
+    };
 
-        axios({
+       /* axios({
             method: 'post',
-            url: 'http://localhost:8080/api/loginuser',
+            url: config.base_url+'loginuser',
             data: {
                 "email": email,
                 "password": password
@@ -84,12 +105,9 @@ class LogIn extends React.Component{
             this.clearForm();
         }).catch(err => {
             console.log("Submit form:- ", err.response.data.message);
-            this.setState({
-                open:true
-            });
-            this.clearForm();
+
         });
-    };
+    };*/
 
     clearForm = () => {
         this.setState({

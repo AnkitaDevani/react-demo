@@ -117,9 +117,9 @@ class ForgotPass extends React.Component{
 
         return(
             <div>
-                <div className="container_forgot">
-                    <h1 align='left' style={{margin:'0px 10px',padding:'15px',fontSize:'40px'}}>Login</h1>
-                    <h1 align='left' style={{margin:'0px 25px',fontSize:'15px',fontWeight:'lighter'}}>Sign in to your account</h1>
+                <div className="container_email">
+                    <h1 align='left' style={{margin:'0px 10px',padding:'15px',fontSize:'40px'}}>Forgot Password</h1>
+                    <h1 align='left' style={{margin:'0px 25px',fontSize:'15px',fontWeight:'lighter'}}>Enter your email address</h1>
                     <FormGroup style={{margin:'10px' }}>
 
                         <TextField style={{margin:'10px 15px'}} id="outlined-basic"
@@ -128,7 +128,7 @@ class ForgotPass extends React.Component{
                                    InputProps={{
                                        startAdornment: (
                                            <InputAdornment position="start">
-                                               <AccountCircle style={{color:'black'}}/>
+                                               <AccountCircle style={{color:'skyblue'}}/>
                                            </InputAdornment>
                                        ),
                                    }}/>

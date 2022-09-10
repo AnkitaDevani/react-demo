@@ -13,6 +13,8 @@ import Stack from '@mui/material/Stack';
 import { Table , TableBody,TableCell,TableHead,TableRow,Select,MenuItem,FormControl,FormLabel,InputLabel} from '@material-ui/core';
 import axios from "axios";
 import Layout from "./layout";
+import config from "./url";
+import {getSubjectList, loginUser, allUsers, deleteUser} from "./_data";
 
 class TableList extends React.Component{
     constructor(props){
@@ -26,6 +28,7 @@ class TableList extends React.Component{
             course:"",
             gender:"",
             records:[],
+            courseList:[],
             editableId:"",
             searchRecords:"",
             perPage: 5,
@@ -36,47 +39,26 @@ class TableList extends React.Component{
         }
     }
 
-    componentDidMount() {
-        /*const path = this.props.history.location.pathname;
-        const splittedRute = path.split("/")[2] || null;*/
-        const token = localStorage.getItem('token');
-
-        axios({
-            method: 'get',
-            url: 'http://localhost:8080/api/getLoggedInUser',
-            headers: {"Authorization": `Bearer ${token}`},
-        }).then(res => {
-
-            if(res.data.role === "admin") {
-                axios({
-                    method: 'get',
-                    url: 'http://localhost:8080/api/users',
-                }).then(res => {
-                    console.log(res.data);
-                    this.setState({
-                        records: res.data,
-                    });
-                }).catch(err => {
-                    console.log("Submit form:- ",err);
-                });
-            }else {
-                axios({
-                    method: 'get',
-                    url: 'http://localhost:8080/api/getLoggedInUser',
-                    headers: {"Authorization": `Bearer ${token}`},
-                }).then(res => {
-                    console.log(res.data);
-                    this.state.records.push(res.data);
-                    this.setState({
-                        records:this.state.records,
-                    });
-                }).catch(err => {
-                    console.log("Submit form:- ", err.response.data.message);
-                });
-            }
-        }).catch(err => {
-            console.log("Submit form:- ", err);
+   async componentDidMount() {
+        const subjectList = await getSubjectList();
+        this.setState({
+            courseList: subjectList.data,
         });
+        const response = await loginUser();
+        if(response.data.role === "admin") {
+            const allUser = await allUsers();
+            console.log(allUser.data);
+            this.setState({
+                records: allUser.data,
+            });
+        }else {
+            this.state.records.push(response.data);
+            this.setState({
+                records:this.state.records,
+            });
+
+        }
+
     }
 
     onEdit = (editUser) => {
@@ -93,23 +75,14 @@ class TableList extends React.Component{
         }
     };
 
-    onDelete = (ele) => {
+    onDelete = async (ele) => {
         debugger
-        let token = localStorage.getItem("token");
-        axios({
-            method: 'delete',
-            url: 'http://localhost:8080/api/delete/'+ ele._id,
-            headers: {"Authorization": `Bearer ${token}`},
-        }).then(res => {
-            const { records } = this. state;
-            const delrecords = records.filter(e => e._id !== res.data._id);
-            this.setState({
-                records: delrecords
-            });
-        }).catch(err => {
-            console.log("Submit form:- ", err.response.data.message);
+        const responce = await deleteUser(ele._id);
+        const { records } = this. state;
+        const delrecords = records.filter(e => e._id !== responce.data._id);
+        this.setState({
+            records: delrecords
         });
-
     };
 
     onPageChange = (ele) => {
@@ -145,14 +118,14 @@ class TableList extends React.Component{
     };
 
     render() {
-        const { perPage,displayRecords,records,totalPages,currentPage} = this.state;
+        const { perPage,displayRecords,records,totalPages,currentPage,courseList} = this.state;
         const pageArr = Array.from(Array(totalPages).keys());
 
 
         return(
             <div>
                 <Layout/>
-                <FormControl variant="outlined" style={{marginTop:'110px',marginLeft:'150px',width:'100px',marginBottom:'20px'}}>
+               {/* <FormControl variant="outlined" style={{marginTop:'110px',marginLeft:'150px',width:'100px',marginBottom:'20px'}}>
 
                     <InputLabel >Entry</InputLabel>
                     <Select label="Course" defaultValue="5" value={perPage} name="perpage" onChange={this.selectEntry} >
@@ -161,9 +134,9 @@ class TableList extends React.Component{
                         <MenuItem  value="25">25</MenuItem>
                     </Select>
 
-                </FormControl>
+                </FormControl>*/}
 
-                <TableContainer component={Paper} style={{marginTop:'30px',width:'1100px',margin:'auto'}}>
+                <TableContainer component={Paper} style={{width:'1100px',margin:'auto',marginTop:'150px'}}>
                     <Table sx={{ minWidth: 650 }} aria-label="simple table">
                         <TableHead style={{backgroundColor:'paleturquoise',cursor:'pointer'}}>
                             <TableRow>
@@ -187,7 +160,7 @@ class TableList extends React.Component{
                                         <TableCell align="center">{row.lname}</TableCell>
                                         <TableCell align="center">{row.email}</TableCell>
                                         <TableCell align="center">{row.hobbies.toString()}</TableCell>
-                                        <TableCell align="center">{row.course}</TableCell>
+                                        <TableCell align="center">{(courseList.find(ele => ele._id ===row.course)).subject}</TableCell>
                                         <TableCell align="center">{row.gender}</TableCell>
                                         <TableCell align="center">
                                             <Button variant="contained" color="primary" id={row._id} onClick={()=>this.onEdit(row)}>Edit</Button>
@@ -201,13 +174,6 @@ class TableList extends React.Component{
                         </TableBody>
                     </Table>
                 </TableContainer>
-                {
-                    Array.from(Array(totalPages).keys()).map(ele => {debugger
-                        return <div key={ele} id="pagination"  className={currentPage === ele+1 ?"disabled":""}>
-
-                        </div>
-                    })
-                }
 
             </div>
         )

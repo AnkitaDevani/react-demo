@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import './App.css';
+import './styles.scss';
 import logo from './ds_logo.png';
 import {
     AppBar,

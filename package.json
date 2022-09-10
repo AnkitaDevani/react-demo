@@ -15,6 +15,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^0.27.2",
+    "deferred": "^0.7.11",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-draggable": "^4.4.5",
@@ -25,6 +26,8 @@
     "redux": "^4.2.0",
     "redux-devtools-extension": "^2.13.9",
     "redux-logger": "^3.0.6",
+    "sass": "^1.54.9",
+    "scss": "^0.2.4",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
