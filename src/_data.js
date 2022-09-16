@@ -4,6 +4,7 @@ import BaseUrl from "./url";
     return localStorage.getItem(key);
 };
 
+
 const config = () => ({
     headers: {
          Authorization:`Bearer ${getFromStorage("token")}`,
@@ -13,9 +14,10 @@ const config = () => ({
 });
 const profile_config = () => ({
     headers: {
-        Authorization:`Bearer  ${getFromStorage("token")}`,
+        Authorization:`Bearer ${getFromStorage("token")}`,
         Accept: 'application/json',
-        'Content-Type':  'multipart/form-data',
+        "Content-Type": "multipart/form-data",
+        "type": "formData"
     }
 });
 
@@ -23,6 +25,16 @@ const profile_config = () => ({
 export const getSubjectList = async () => {
     try {
         const url = `${BaseUrl.base_url}subjectList`;
+        const res = await axios.get(url);
+        return { success: true, data: res.data }
+    } catch (e) {
+        return { success: false, msg: "Something went wrong"};
+    }
+};
+
+export const getSelectedSub = async () => {
+    try {
+        const url = `${BaseUrl.base_url}userDetails`;
         const res = await axios.get(url);
         return { success: true, data: res.data }
     } catch (e) {
@@ -51,10 +63,11 @@ export const deleteSubject = async (ele) => {
 };
 
 //loginUser details
-export const addactiveUser = async (data) => {
+export const addactiveUser = async (data,isSignIn) => {
     try {
         const url = `${BaseUrl.base_url}loginuser`;
-        const res = await axios.post(url,data);
+        debugger
+        const res = await axios.post(url,data,isSignIn);
         return { success: true, data: res.data }
     } catch (e) {
         return { success: false, msg: "Something went wrong"};
@@ -132,6 +145,7 @@ export const deleteUser = async (id) => {
 export const uploadProfile = async (data) => {
     try {
         const url = `${BaseUrl.base_url}uploadProfilePic`;
+        debugger
         const res = await axios.post(url,data,profile_config());
         return { success: true, data: res.data }
     } catch (e) {

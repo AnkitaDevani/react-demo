@@ -7,6 +7,15 @@ $red : red;
 $darkblue : darkblue;
 
 @import "./sheetstyle.scss";
+.link1{
+  font-size: 20px;
+  text-decoration: none;
+  color: #2a9df4;
+  opacity: 0.5;
+  font-variant: all-small-caps;
+  font-weight: bold;
+  transition: cubic-bezier(.77,0,.18,1) 1s;
+}
 
 .link{
   font-size: 15px;
@@ -18,6 +27,7 @@ $darkblue : darkblue;
   font-weight: bold;
   transition: cubic-bezier(.77,0,.18,1) 1s;
 }
+
 .link:hover{
   opacity: 1;
   -moz-transition: all .3s ease-in-out;
@@ -259,4 +269,30 @@ $darkblue : darkblue;
 
 .hide{
   display: none !important;
+}
+
+.container_form{
+  @include important-text;
+  margin: auto;
+  width: 400px;
+  padding: 20px;
+  margin-top: 80px;
+  margin-bottom: 20px;
+  border-radius: 20px;
+
+  h1{
+    color: darkblue;
+    margin:6px;
+    padding:5px;
+    font-size:30px;
+  }
+
+  .google{
+      width: 8%;
+      height: 1%;
+      margin: 5px;
+      float: left;
+  }
+
+
 }

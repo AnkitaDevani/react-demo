@@ -6,7 +6,8 @@ import Avatar from '@material-ui/core/Avatar';
 import Layout from "./layout";
 import FormData from 'form-data';
 import config from "./url";
-import {allUsers, deleteUser, getSubjectList, loginUser, uploadProfile} from "./_data";
+import {allUsers, deleteUser, getSubjectList, loginUser, uploadProfile, getSelectedSub, logoutUser} from "./_data";
+import { GoogleLogout } from 'react-google-login';
 
 class Blog extends React.Component{
     constructor(){
@@ -27,6 +28,7 @@ class Blog extends React.Component{
             records:[],
             profile:"",
             viewProfile:"",
+            isLogined: false,
         }
     }
 
@@ -48,7 +50,7 @@ class Blog extends React.Component{
         }
     }
 
-    userDetail = (findUser) => {
+    userDetail = async (findUser) => {
         debugger
         const {courseList} = this.state;
         const course = courseList.find(ele => ele._id === findUser.course);
@@ -81,9 +83,9 @@ class Blog extends React.Component{
         );
         const data = formData;
         debugger
-        const profile= await uploadProfile(data);
+        const profilePic= await uploadProfile(data);
         this.setState({
-            viewProfile:profile.data.profile,
+            viewProfile:profilePic.data.profile,
             profile: ""
         });
     };
@@ -122,12 +124,25 @@ class Blog extends React.Component{
             pathname: `/changepass`,
         })
     };
+    logout = async (response) => {
+        this.setState({
+            isLogined: false,
+        } ,async () =>   await logoutUser());
 
+        localStorage.setItem("token",null);
+        localStorage.setItem("email",null);
+        window.location.href="/login";
+    };
 
+    handleLogoutFailure = (response) => {
+        alert('Failed to log out');
+    };
 
     render() {
         const {fname, lname, course, hobbies,gender, email, password,records ,editableId,viewProfile} = this.state;
         const name = Array.from(fname)[0];
+        const clientId = '391355494928-dqa84reekge0vaph9ojdjdqdfc55jcgi.apps.googleusercontent.com';
+
         return (
             <div>
                 <Layout/>
@@ -135,7 +150,7 @@ class Blog extends React.Component{
                     <div>
                         <label htmlFor="profilePhoto">
                             <input style={{display:'none'}} accept="image/*" id="profilePhoto"  type="file" onChange={this.profile}/>
-                            <Avatar style={{fontSize:'150px',width:'120px',height:'120px',cursor:'pointer',margin:'auto',alignItems:"end",}}
+                            <Avatar style={{fontSize:'120px',width:'120px',height:'120px',cursor:'pointer',margin:'auto'}}
                                     src={`http://localhost:8080/${viewProfile}`}>{name}</Avatar>
                         </label>
                     </div>
@@ -147,8 +162,13 @@ class Blog extends React.Component{
                     <Button variant="contained"  id={records._id} color="secondary" onClick={()=>this.onDelete(records)}
                             style={{marginRight:'20px'}}>Delete</Button>
                     <Button variant="contained"  id={records._id} color="secondary" onClick={()=>this.changePass(records.password)}>Change Password</Button>
-
-
+                    <GoogleLogout
+                        clientId={ clientId }
+                        buttonText='Logout'
+                        onLogoutSuccess={ this.logout }
+                        onFailure={ this.handleLogoutFailure }
+                    >
+                    </GoogleLogout>
                 </div>
             </div>
         );

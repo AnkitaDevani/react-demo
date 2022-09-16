@@ -2,10 +2,14 @@ import logo from './ds_logo.png';
 import './styles.scss';
 import Layout from "./layout";
 import web from "./web2.png";
+import img1 from "./image1.jpg";
+import img2 from "./image2.jpg";
+import img3 from "./image3.jpg";
 import React from "react";
 import {Button, Box} from '@material-ui/core';
 //import BottomNavigationAction from "@material-ui/core/BottomNavigationAction";
 //import RestoreIcon from "@mui/material/SvgIcon/SvgIcon";
+import SimpleImageSlider from "react-simple-image-slider";
 import { BottomNavigation } from '@material-ui/core';
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
 import FolderIcon from '@mui/icons-material/Folder';
@@ -18,7 +22,9 @@ class Home extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-
+            images:[ { url: img1 },
+                { url: img2 },
+                { url: img3 }]
         };
     }
     register = () => {
@@ -31,6 +37,14 @@ class Home extends React.Component{
         return (
             <div className="home">
                 <Layout/>
+                    <SimpleImageSlider
+                        width={1317.5}
+                        height={600}
+                        style={{marginTop:'30px'}}
+                        images={this.state.images}
+                        showBullets={true}
+                        showNavs={true}
+                    />
                 <img src={web} className="image"/>
                 <p> Make Your <br/>Dream True<br/>With Our Academy.</p>
 

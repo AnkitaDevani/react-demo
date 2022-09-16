@@ -49,23 +49,15 @@ class ForgotPass extends React.Component{
     };
 
     submitForm = () => {
-        const {email, password, records} = this.state;
-        const findUser = records.find(ele => ele.email === this.state.email);
-        if(findUser) {
+        const {email} = this.state;
             axios({
                 method: 'post',
-                url: 'http://localhost:8080/api/loginuser',
+                url: 'http://localhost:8080/api/mail',
                 data: {
                     "email": email,
-                    "password": password
                 }
             }).then(res => {
-                localStorage.setItem("token", res.data.token);
-                localStorage.setItem("email", res.data.email);
-                //const findUser = records.find(ele => ele.email === res.data.email);
-                this.props.history.push({
-                    pathname: `/blog`,
-                });
+                console.log(res);
                 this.clearForm();
             }).catch(err => {
                 console.log("Submit form:- ", err.response.data.message);
@@ -74,11 +66,6 @@ class ForgotPass extends React.Component{
                 });
                 this.clearForm();
             });
-        }else {
-            this.setState({
-                open:true
-            })
-        }
     };
 
     clearForm = () => {

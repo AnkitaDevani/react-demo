@@ -22,6 +22,7 @@ import Draggable from 'react-draggable';
 import Paper from '@material-ui/core/Paper';
 import config from "./url";
 import {addactiveUser} from "./_data";
+import LogInGoogle from "./googleLogin";
 
 function PaperComponent(props) {
     return (
@@ -77,9 +78,7 @@ class LogIn extends React.Component{
         if (res.success === true) {
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("email", res.data.email);
-            this.props.history.push({
-                pathname: `/blog`,
-            });
+            window.location.href="/login";
             this.clearForm();
         } else {
             this.setState({
@@ -129,7 +128,7 @@ class LogIn extends React.Component{
 
     register = () => {
         this.props.history.push({
-            pathname: `/register`,
+            pathname: `/form`,
         })
     };
 
@@ -191,9 +190,9 @@ class LogIn extends React.Component{
                                 />
                             </FormControl>
 
-                            <FormControl style={{display:'flex',flexDirection:'row',marginLeft:'15px',marginTop:'20px'}}>
-                                <Button variant="contained" color="primary" onClick={this.submitForm} style={{width:'60px',padding:'0px 50px',fontSize:'18px'}}>Submit</Button>
-
+                            <FormControl style={{display: "-webkit-inline-box",flexDirection:'row',marginLeft:'15px',marginTop:'20px'}}>
+                                <Button variant="contained" color="primary" onClick={this.submitForm} style={{width:'90px',padding:'6px',fontSize:'18px',marginRight:'10px'}}>Submit</Button>
+                                <LogInGoogle/>
                                 <Dialog open={open} onClose={this.handleClose} PaperComponent={PaperComponent} aria-labelledby="draggable-dialog-title"
                                         style={{marginLeft:'10px'}}>
                                     <DialogTitle style={{ cursor: 'move'}} id="draggable-dialog-title">
@@ -215,7 +214,8 @@ class LogIn extends React.Component{
                                         </Button>
                                     </DialogActions>
                                 </Dialog>
-                                <h3 style={{marginLeft:'160px'}}><Link to="/forgotpass" > Forgot Password? </Link></h3>
+
+                                <h3 style={{marginLeft:'70px'}}><Link to="/forgotpass" > Forgot Password? </Link></h3>
                             </FormControl>
                         </FormGroup>
                     </div>
@@ -223,7 +223,7 @@ class LogIn extends React.Component{
                     <div className="container_sign">
                         <h1>Sign up</h1>
                         <p>If you have <br/>not account than <br/>sign up here </p>
-                        <Button variant="contained" color="primary" onClick={this.register} >Register Now!</Button>
+                        <Button variant="contained" color="primary" onClick={this.register} >Sign up Here!</Button>
                     </div>
                 </div>
             </div>

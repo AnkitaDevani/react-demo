@@ -13,13 +13,13 @@ import Layout from "./layout";
 import Blog from "./blog";
 import Home from "./home";
 import Subject from "./subject";
-
+import Form from "./form";
 import TableList from "./table.js";
 import "./sheetstyle.scss";
 import ForgotPass from "./forgotpass";
 import ChangePass from "./changePass";
 import LogOut from "./logout";
-
+import LogInGoogle from "./googleLogin";
 
 function App() {
 return (
@@ -33,8 +33,11 @@ return (
             <Route exact path="/register/:id" component={Register} />
             <Route exact path="/subject" component={Subject} />
             <Route exact path="/logout" component={LogOut} />
+            <Route exact path="/form" component={Form} />
+            <Route exact path="/googlelogin" component={LogInGoogle} />
             <>
               <UnAuth/>
+
               <Route exact path="/"  component={Register} />
               <Route exact path="/forgotpass" component={ForgotPass} />
               <Route exact path="/login" component={LogIn} />
