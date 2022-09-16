@@ -20,6 +20,8 @@ import ForgotPass from "./forgotpass";
 import ChangePass from "./changePass";
 import LogOut from "./logout";
 import LogInGoogle from "./googleLogin";
+import ResGoogle from "./regWithGoogle";
+import GoogleUser from "./googleUser";
 
 function App() {
 return (
@@ -35,6 +37,7 @@ return (
             <Route exact path="/logout" component={LogOut} />
             <Route exact path="/form" component={Form} />
             <Route exact path="/googlelogin" component={LogInGoogle} />
+            <Route exact path="/reswithgoogle" component={GoogleUser} />
             <>
               <UnAuth/>
 

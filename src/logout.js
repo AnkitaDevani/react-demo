@@ -3,17 +3,12 @@ import { logoutUser } from "./_data";
 import { useGoogleLogout } from 'react-google-login';
 
 
-async function LogOut() {
-        debugger;
+ const LogOut = async () => {
     const res = await logoutUser();
+     localStorage.setItem("isLogedIn",false);
     localStorage.setItem("token",null);
     localStorage.setItem("email",null);
-
-
     window.location.href="/login";
 };
-
-
-
 
 export default LogOut;

@@ -7,7 +7,6 @@ import Layout from "./layout";
 import FormData from 'form-data';
 import config from "./url";
 import {allUsers, deleteUser, getSubjectList, loginUser, uploadProfile, getSelectedSub, logoutUser} from "./_data";
-import { GoogleLogout } from 'react-google-login';
 
 class Blog extends React.Component{
     constructor(){
@@ -124,24 +123,11 @@ class Blog extends React.Component{
             pathname: `/changepass`,
         })
     };
-    logout = async (response) => {
-        this.setState({
-            isLogined: false,
-        } ,async () =>   await logoutUser());
-
-        localStorage.setItem("token",null);
-        localStorage.setItem("email",null);
-        window.location.href="/login";
-    };
-
-    handleLogoutFailure = (response) => {
-        alert('Failed to log out');
-    };
 
     render() {
         const {fname, lname, course, hobbies,gender, email, password,records ,editableId,viewProfile} = this.state;
         const name = Array.from(fname)[0];
-        const clientId = '391355494928-dqa84reekge0vaph9ojdjdqdfc55jcgi.apps.googleusercontent.com';
+        const clientId = '884778620106-150hi24nmdube87dht92p30bd5ijgqko.apps.googleusercontent.com';
 
         return (
             <div>
@@ -162,13 +148,6 @@ class Blog extends React.Component{
                     <Button variant="contained"  id={records._id} color="secondary" onClick={()=>this.onDelete(records)}
                             style={{marginRight:'20px'}}>Delete</Button>
                     <Button variant="contained"  id={records._id} color="secondary" onClick={()=>this.changePass(records.password)}>Change Password</Button>
-                    <GoogleLogout
-                        clientId={ clientId }
-                        buttonText='Logout'
-                        onLogoutSuccess={ this.logout }
-                        onFailure={ this.handleLogoutFailure }
-                    >
-                    </GoogleLogout>
                 </div>
             </div>
         );

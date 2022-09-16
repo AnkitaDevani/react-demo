@@ -100,6 +100,7 @@ export const logoutUser = async () => {
 export const userRegistration = async (data) => {
     try {
         const url = `${BaseUrl.base_url}submit`;
+        debugger
         const res = await axios.post(url,data);
         return { success: true, data: res.data }
     } catch (e) {

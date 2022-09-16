@@ -14,7 +14,7 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import IconButton from "@material-ui/core/IconButton";
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
-
+import ResGoogle from "./regWithGoogle";
 import {getSubjectList, userRegistration, updatedUser, loginUser, allUsers} from "./_data";
 
 
@@ -95,6 +95,7 @@ class Register extends React.Component{
         "course": selectedCourse._id,
         "role": "user"
       };
+      console.log(data);
       const registration = await userRegistration(data);
       console.log(registration.data);
       this.clearForm();
@@ -280,6 +281,7 @@ class Register extends React.Component{
                 </ThemeProvider>
               </FormControl>
             </FormGroup>
+            <ResGoogle/>
           </div>
         </div>
     );
