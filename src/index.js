@@ -22,6 +22,7 @@ import LogOut from "./logout";
 import LogInGoogle from "./googleLogin";
 import ResGoogle from "./regWithGoogle";
 import GoogleUser from "./googleUser";
+import "./firebase.js";
 
 function App() {
 return (

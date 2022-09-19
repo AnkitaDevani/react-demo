@@ -16,7 +16,8 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import ResGoogle from "./regWithGoogle";
 import {getSubjectList, userRegistration, updatedUser, loginUser, allUsers} from "./_data";
-
+import {db} from './firebase';
+import {collection, doc, addDoc, updateDoc, Timestamp, query, orderBy, onSnapshot} from 'firebase/firestore';
 
 class Register extends React.Component{
   constructor(props){
@@ -37,12 +38,25 @@ class Register extends React.Component{
       records:[],
       profile:"",
       showPassword: false,
+      data:[],
+      id:''
     }
   }
 
   async componentDidMount(e) {
     const isLoggedIn = localStorage.getItem("token");
     const subjectList = await getSubjectList();
+   /* const q = query(collection(db, 'tasks'), orderBy('created', 'desc'));
+    onSnapshot(q, querysnapshot => {
+      querysnapshot.docs.map(doc => {
+        console.log(doc.data());
+        this.state.data.push(doc.data());
+        this.setState({
+          id: doc.id,
+          data: this.state.data,
+        });
+      });
+    });*/
     if(isLoggedIn === "null") {
         this.setState({
           courseList: subjectList.data,
@@ -84,7 +98,24 @@ class Register extends React.Component{
     const {fname, lname, hobbies, course, gender, email, password, editableId, courseList} = this.state;
     const token = localStorage.getItem("token");
     const selectedCourse = courseList.find(ele => ele.subject === course);
+
     if (token === "null") {
+      /*try {
+        await addDoc(collection(db, 'records'), {
+          fname: fname.charAt().toUpperCase()+ fname.slice(1).toLowerCase(),
+          lname: lname.charAt().toUpperCase()+ lname.slice(1).toLowerCase(),
+          hobbies: hobbies,
+          email: email,
+          password: password,
+          gender: gender,
+          course: selectedCourse._id,
+          role: "user",
+          created: Timestamp.now()
+        });
+
+      } catch (err) {
+        alert(err)
+      }*/
       const data = {
         "fname": fname.charAt().toUpperCase()+ fname.slice(1).toLowerCase(),
         "lname": lname.charAt().toUpperCase()+ lname.slice(1).toLowerCase(),
@@ -104,6 +135,22 @@ class Register extends React.Component{
       });
 
     } else {
+      /*const taskDocRef = doc(db, 'tasks',this.state.id );
+      try{
+        await updateDoc(taskDocRef, {
+          fname: fname.charAt().toUpperCase()+ fname.slice(1).toLowerCase(),
+          lname: lname.charAt().toUpperCase()+ lname.slice(1).toLowerCase(),
+          hobbies: hobbies,
+          email: email,
+          password: password,
+          gender: gender,
+          course: selectedCourse._id,
+          role: "user",
+          created: Timestamp.now()
+        })
+      } catch (err) {
+        alert(err)
+      }*/
       const data = {
         "fname": fname.charAt().toUpperCase()+ fname.slice(1).toLowerCase(),
         "lname": lname.charAt().toUpperCase()+ lname.slice(1).toLowerCase(),
@@ -178,7 +225,7 @@ class Register extends React.Component{
       password: editUser.password,
       gender:editUser.gender,
       dob: editUser.dob,
-      editableId: editUser._id
+      editableId: editUser.created
     });
 
   };

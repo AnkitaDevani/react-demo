@@ -15,6 +15,8 @@ import axios from "axios";
 import Layout from "./layout";
 import config from "./url";
 import {getSubjectList, loginUser, allUsers, deleteUser} from "./_data";
+import {collection, query, orderBy, onSnapshot,deleteDoc,doc} from "firebase/firestore";
+import {db} from './firebase';
 
 class TableList extends React.Component{
     constructor(props){
@@ -36,6 +38,8 @@ class TableList extends React.Component{
             totalPages: 0,
             currentPage: 1,
             displayRecords: [],
+            id:'',
+            data:[],
         }
     }
 
@@ -44,6 +48,19 @@ class TableList extends React.Component{
         this.setState({
             courseList: subjectList.data,
         });
+      /* const q = query(collection(db, 'records'), orderBy('created', 'desc'));
+       onSnapshot(q, querysnapshot => {
+           querysnapshot.docs.map( doc => {
+               console.log(doc.data());
+               this.state.data.push(doc.data());
+               this.setState({
+                   id:doc.id,
+                   data:this.state.data,
+               });
+           });
+
+       });*/
+
         const response = await loginUser();
         if(response.data.role === "admin") {
             const allUser = await allUsers();
@@ -61,6 +78,8 @@ class TableList extends React.Component{
 
     }
 
+
+
     onEdit = (editUser) => {
         let logEmail = localStorage.getItem("email");
         if(editUser.email) {
@@ -76,7 +95,17 @@ class TableList extends React.Component{
     };
 
     onDelete = async (ele) => {
-        debugger
+
+        /*const taskDocRef = doc(db, 'records', this.state.id);
+        try{
+           const res =  await deleteDoc(taskDocRef);
+            const delrecords1 = this.state.data.filter(e => e.created.seconds !== res.data.created.seconds);
+            this.setState({
+               data: delrecords1
+            });
+        } catch (err) {
+            alert(err)
+        }*/
         const responce = await deleteUser(ele._id);
         const { records } = this. state;
         const delrecords = records.filter(e => e._id !== responce.data._id);
